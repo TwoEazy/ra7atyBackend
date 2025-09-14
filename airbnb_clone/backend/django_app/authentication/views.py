@@ -3,8 +3,9 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import RegisterSerializer, LoginSerializer
+from .serializers import RegisterSerializer, LoginSerializer, UserProfileSerializer
 from django.contrib.auth import get_user_model
+from rest_framework import permissions
 
 User = get_user_model()
 
@@ -38,3 +39,10 @@ class LoginView(generics.GenericAPIView):
                 'access': str(refresh.access_token),
             }, status=status.HTTP_200_OK)
         return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
